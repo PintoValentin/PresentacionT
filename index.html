@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CÓDIGO KREMLIN · LUNIK 3 &amp; YURI GAGARIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Oswald',sans-serif;cursor:none}
+
+.custom-cursor{
+  position:fixed;width:24px;height:24px;
+  border:4px solid #FF0000;border-radius:50%;
+  pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  transition:width 0.15s,height 0.15s,background 0.15s;
+}
+.custom-cursor.click{width:14px;height:14px;background:#FF0000}
+
+#intro{
+  position:fixed;inset:0;
+  background:#050505;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:9999;
+  transition:opacity 0.6s ease;
+  border:20px solid #FF0000;
+}
+#intro.hide{opacity:0;pointer-events:none}
+
+.intro-static{
+  position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.99' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+  opacity:0.8;pointer-events:none;
+}
+
+.intro-flag{
+  display:flex;flex-direction:column;
+  width:120px;height:80px;
+  margin-bottom:30px;
+  border:3px solid #FFD700;
+  overflow:hidden;
+  box-shadow:0 0 40px #FF0000;
+}
+.intro-flag div{flex:1}
+.flag-white{background:#fff}
+.flag-blue{background:#003DA5}
+.flag-red{background:#FF0000}
+
+.intro-canal{
+  color:#FFD700;
+  font-size:16px;font-weight:900;
+  letter-spacing:8px;text-transform:uppercase;
+  margin-bottom:15px;
+  font-family:'Barlow Condensed',sans-serif;
+}
+.intro-title{
+  color:#fff;
+  font-size:clamp(50px,8vw,90px);
+  font-weight:900;letter-spacing:6px;
+  text-transform:uppercase;text-align:center;
+  line-height:0.9;margin-bottom:15px;
+  font-family:'Barlow Condensed',sans-serif;
+}
+.intro-title span{color:#FF0000;text-shadow:0 0 20px #FF0000}
+.intro-sub{
+  color:#999;font-size:16px;
+  letter-spacing:6px;text-transform:uppercase;
+  margin-bottom:60px;font-family:'Barlow Condensed',sans-serif;
+}
+.intro-btn{
+  border:4px solid #FFD700;background:#FF0000;
+  color:#fff;font-family:'Oswald',sans-serif;
+  font-size:16px;font-weight:900;letter-spacing:4px;
+  text-transform:uppercase;padding:20px 60px;
+  cursor:pointer;position:relative;
+  box-shadow:0 0 20px rgba(255,0,0,0.8);
+  transition:transform 0.2s;
+}
+.intro-btn:hover{transform:scale(1.05);background:#FF2222}
+.intro-hint{
+  color:#555;font-size:13px;
+  letter-spacing:3px;text-transform:uppercase;
+  margin-top:24px;font-family:'Barlow Condensed',sans-serif;
+}
+
+#presenter{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  background:#000;
+  opacity:0;transition:opacity 0.5s ease;
+  border:10px solid #000;
+}
+#presenter.show{opacity:1}
+
+#img-area{
+  flex:1;position:relative;overflow:hidden;
+  background:#030303;
+  border:6px solid #222;
+}
+
+#camera-feed{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  z-index:0;
+  transform:scaleX(-1);
+}
+
+#camera-error{
+  position:absolute;inset:0;
+  display:none;align-items:center;justify-content:center;
+  background:#0a0000;
+  z-index:1;
+  color:#FF0000;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:20px;letter-spacing:4px;text-transform:uppercase;
+  text-align:center;flex-direction:column;gap:12px;
+}
+#camera-retry-btn{
+  margin-top:10px;
+  background:#FF0000;border:3px solid #FFD700;color:#fff;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;
+  letter-spacing:3px;text-transform:uppercase;padding:12px 28px;cursor:pointer;
+  box-shadow:0 0 14px rgba(255,0,0,0.6);transition:transform 0.15s;
+}
+#camera-retry-btn:hover{transform:scale(1.05);background:#FF2222}
+
+#img-area::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 3px,
+    rgba(0,0,0,0.22) 3px,rgba(0,0,0,0.22) 6px
+  );
+  pointer-events:none;z-index:10;
+}
+
+#img-area::before{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:11;opacity:0.7;
+}
+
+.slide-bg{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:20px;
+  opacity:0;transition:opacity 0.4s steps(4);
+  background:transparent;
+}
+.slide-bg.active{opacity:1}
+
+.slide-bg.has-img{background-size:cover;background-position:center;background-repeat:no-repeat}
+.slide-bg.has-img::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.7) 100%);
+  z-index:1;
+}
+
+/* ===== Videos a pantalla completa dentro de un slide-bg (fundido heredado del slide-bg) ===== */
+.fs-video-wrap{
+  position:absolute;inset:0;
+  z-index:1;
+  background:#000;
+}
+.fs-video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  background:#000;
+}
+.fs-video-caption{
+  position:absolute;left:0;bottom:0;right:0;
+  z-index:2;
+  padding:14px 30px;
+  background:linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+  color:#FFD700;font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(13px,1.6vw,18px);font-weight:900;
+  letter-spacing:4px;text-transform:uppercase;
+}
+
+.slide-bg-icon{
+  font-size:clamp(80px,12vw,160px);
+  filter:drop-shadow(0 10px 30px rgba(0,0,0,0.9));
+  position:relative;z-index:2;
+}
+
+.slide-bg-label{
+  color:rgba(255,255,255,0.4);
+  font-size:clamp(13px,1.5vw,18px);font-weight:700;
+  letter-spacing:5px;text-transform:uppercase;
+  font-family:'Barlow Condensed',sans-serif;
+  position:relative;z-index:2;
+  background:rgba(0,0,0,0.8);
+  padding:4px 12px;
+  border:2px solid #333;
+}
+
+.segment-overlay{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:20px;
+  z-index:5;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.3s steps(2);
+}
+.segment-overlay.visible{opacity:1}
+
+#overlay-pausa{
+  background:rgba(15,0,0,0.95);
+  border:15px solid #FF0000;
+}
+.pausa-box{
+  border:8px double #FFD700;
+  padding:40px 70px;text-align:center;
+  position:relative;
+  background:#000;
+}
+.pausa-box::before,.pausa-box::after{
+  content:'★';color:#FFD700;
+  position:absolute;top:-22px;font-size:32px;
+  background:#000;padding:0 10px;
+  font-weight:900;
+}
+.pausa-box::before{left:30px}
+.pausa-box::after{right:30px}
+.pausa-top{
+  color:#FFD700;font-size:16px;letter-spacing:8px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;
+  text-transform:uppercase;margin-bottom:15px;
+}
+.pausa-title{
+  color:#fff;font-size:clamp(40px,6vw,72px);
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;
+  letter-spacing:6px;text-transform:uppercase;line-height:0.9;
+  margin-bottom:15px;
+}
+.pausa-bar{
+  width:100%;height:8px;background:#FF0000;
+  margin:20px 0;
+  position:relative;
+}
+.pausa-sub{
+  color:#aaa;font-size:16px;letter-spacing:5px;
+  font-family:'Barlow Condensed',sans-serif;
+  text-transform:uppercase;font-weight:700;
+}
+
+#overlay-video{
+  background:rgba(0,0,0,0.95);
+}
+.video-frame{
+  width:min(720px, 85vw);
+  aspect-ratio:4/3;
+  border:6px solid #FFD700;
+  background:#050505;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:15px;
+  position:relative;
+  box-shadow:0 0 30px rgba(0,0,0,1);
+}
+.video-frame video{
+  width:100%;height:100%;object-fit:cover;
+  position:absolute;inset:0;
+}
+.video-placeholder{
+  display:flex;flex-direction:column;align-items:center;gap:15px;
+  z-index:2;position:relative;
+}
+.video-play-icon{
+  width:80px;height:80px;
+  border:5px solid #FF0000;
+  display:flex;align-items:center;justify-content:center;
+  color:#FF0000;font-size:36px;font-weight:900;
+  background:#000;
+}
+.video-label{
+  color:#fff;font-family:'Barlow Condensed',sans-serif;
+  font-size:16px;letter-spacing:4px;text-transform:uppercase;
+  font-weight:900;
+}
+.video-filename{
+  color:#666;font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;letter-spacing:2px;
+}
+.video-caption{
+  color:#FFD700;font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(14px,1.8vw,20px);font-weight:900;letter-spacing:4px;
+  text-transform:uppercase;text-align:center;
+  max-width:600px;margin-top:10px;
+}
+
+/* ===== Recuadro tipo videollamada para el segmento de Gagarin (video + 5 mp3) ===== */
+.gagarin-call-frame{
+  position:absolute;
+  bottom:260px;left:20px;
+  width:min(260px, 32vw);
+  aspect-ratio:4/3;
+  border:6px solid #FFD700;
+  background:#050505;
+  box-shadow:0 0 40px rgba(0,0,0,1);
+  z-index:6;
+  overflow:hidden;
+}
+.gagarin-call-frame video{
+  width:100%;height:100%;object-fit:cover;
+  position:absolute;inset:0;
+  background:#000;
+}
+.gagarin-call-topbar{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  background:linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0));
+  z-index:2;
+}
+.gagarin-live-dot{
+  width:11px;height:11px;border-radius:50%;
+  background:#FF0000;
+  box-shadow:0 0 8px #FF0000;
+  animation:gagarinPulse 1.1s infinite;
+  flex-shrink:0;
+}
+@keyframes gagarinPulse{
+  0%,100%{opacity:1}
+  50%{opacity:0.25}
+}
+.gagarin-call-label{
+  color:#fff;font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:900;letter-spacing:3px;text-transform:uppercase;
+}
+.gagarin-call-bottombar{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:10px 14px;
+  background:linear-gradient(0deg, rgba(0,0,0,0.85), rgba(0,0,0,0));
+  color:#FFD700;font-family:'Barlow Condensed',sans-serif;
+  font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+  z-index:2;
+}
+
+.esp-tag{
+  position:absolute;bottom:185px;left:0;
+  background:#000;
+  padding:10px 40px 10px 20px;
+  z-index:15;
+  border:4px solid #FF0000;
+  border-left:none;
+  opacity:0;transition:opacity 0.3s;
+}
+.esp-tag.visible{opacity:1}
+.esp-tag-name{
+  color:#FFD700;font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(18px,2.2vw,26px);font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  line-height:1;
+}
+.esp-tag-role{
+  color:#fff;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(12px,1.4vw,16px);font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;
+  margin-top:4px;
+}
+
+#ultima-hora-alert{
+  position:absolute;top:0;left:0;right:0;
+  background:#FF0000;
+  display:flex;align-items:center;
+  z-index:20;
+  transform:translateY(-100%);
+  transition:transform 0.3s steps(4);
+  border-bottom:6px solid #FFD700;
+}
+#ultima-hora-alert.visible{transform:translateY(0)}
+.uh-tag{
+  background:#fff;color:#FF0000;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(18px,2.2vw,26px);font-weight:900;
+  letter-spacing:4px;text-transform:uppercase;
+  padding:15px 30px;white-space:nowrap;flex-shrink:0;
+  border-right:6px solid #000;
+}
+.uh-text{
+  color:#fff;font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(14px,1.8vw,22px);font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:15px 30px;
+}
+
+#clockbox{
+  position:absolute;top:20px;right:20px;
+  background:#000;border:4px solid #FFD700;
+  padding:12px 18px;
+  display:flex;flex-direction:column;align-items:center;
+  z-index:20;min-width:140px;
+  box-shadow:8px 8px 0px rgba(0,0,0,1);
+}
+#clock-time{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(32px,4vw,44px);font-weight:900;
+  color:#fff;line-height:1;letter-spacing:2px;
+}
+#clock-temp{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(14px,1.6vw,18px);font-weight:800;
+  color:#FF0000;line-height:1.3;letter-spacing:1px;
+}
+#clock-date{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(12px,1.4vw,15px);font-weight:900;
+  color:#aaa;letter-spacing:2px;text-transform:uppercase;
+}
+#clock-logo{
+  background:#FF0000;color:#fff;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(12px,1.5vw,16px);font-weight:900;
+  padding:4px 8px;letter-spacing:2px;
+  margin-top:8px;align-self:stretch;
+  text-align:center;text-transform:uppercase;
+  border:2px solid #FFD700;
+}
+
+/* ===== Fotos de tema / invitado especial: costado superior izquierdo, con fundido, sin tapar nada ===== */
+#topic-photos{
+  position:absolute;top:20px;left:20px;
+  z-index:16;
+  display:flex;flex-direction:row;gap:14px;
+  pointer-events:none;
+}
+.topic-photo{
+  width:clamp(200px,18vw,300px);
+  border:4px solid #FFD700;
+  box-shadow:6px 6px 0 rgba(0,0,0,0.9);
+  background:#000;
+  overflow:hidden;
+  opacity:0;
+  transition:opacity 0.4s steps(4);
+}
+.topic-photo.visible{opacity:1}
+.topic-photo img{
+  width:100%;height:clamp(130px,12vw,190px);object-fit:cover;display:block;
+  filter:grayscale(15%) contrast(1.05);
+}
+.topic-photo-cap{
+  background:#FF0000;color:#fff;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(12px,1.2vw,15px);font-weight:900;letter-spacing:2px;
+  text-transform:uppercase;text-align:center;
+  padding:6px 8px;
+  border-top:2px solid #000;
+}
+
+#bottom-bars{
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  background:#FF0000;
+  border-top:8px solid #FFD700;
+}
+
+#bar-thin{
+  background:#D60000;
+  padding:12px 24px;
+  display:flex;
+  align-items:center;
+  min-height:46px;
+  border-bottom:4px solid #000;
+}
+#bar-thin-left{
+  color:#FFD700;font-size:clamp(13px,1.5vw,18px);font-weight:900;
+  letter-spacing:4px;text-transform:uppercase;
+  font-family:'Barlow Condensed',sans-serif;white-space:nowrap;flex:1;
+}
+#dots-container{display:flex;gap:8px;align-items:center;margin-right:20px}
+.cdot{
+  width:12px;height:12px;
+  background:rgba(0,0,0,0.6);
+  border:2px solid #FFD700;
+  cursor:pointer;
+}
+.cdot.active{background:#fff;border-color:#000;transform:scale(1.3)}
+
+#bar-thin-right{
+  color:#fff;font-size:clamp(12px,1.4vw,16px);font-weight:900;
+  letter-spacing:3px;text-transform:uppercase;
+  font-family:'Barlow Condensed',sans-serif;white-space:nowrap;
+  background:#000;padding:2px 10px;
+}
+
+#bar-main{
+  background:#FF0000;
+  display:flex;
+  align-items:center;
+  min-height:125px;
+  padding:0 10px;
+}
+#bar-arrows-left,#bar-arrows-right{
+  color:#000;font-size:28px;font-weight:900;
+  padding:0 24px;height:100%;
+  display:flex;align-items:center;flex-shrink:0;
+  font-family:'Barlow Condensed',sans-serif;
+}
+#bar-headline{
+  flex:1;
+  overflow:hidden;
+  padding:0 20px;
+  background:#000;
+  height:85px;
+  display:flex;
+  align-items:center;
+  border:4px solid #FFD700;
+  box-shadow:inset 0 0 15px rgba(255,0,0,0.5);
+}
+#headline-text{
+  color:#fff;font-size:clamp(20px,2.8vw,36px);
+  font-weight:900;letter-spacing:3px;text-transform:uppercase;
+  font-family:'Barlow Condensed',sans-serif;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+#presenter-badge{
+  position:absolute;bottom:185px;right:0;
+  background:#000;
+  border:4px solid #FFD700;
+  border-right:none;
+  padding:10px 20px 10px 30px;z-index:15;
+  opacity:0;transition:opacity 0.3s;
+  max-width:300px;
+}
+#presenter-badge.visible{opacity:1}
+#presenter-badge .pb-role{
+  color:#FF0000;font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:900;letter-spacing:4px;text-transform:uppercase;
+}
+#presenter-badge .pb-name{
+  color:#fff;font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(16px,2vw,22px);font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;line-height:1.1;
+  margin-top:2px;
+}
+
+#nav-hint{
+  position:absolute;bottom:8px;right:50%;
+  transform:translateX(50%);
+  color:rgba(0,0,0,0.7);
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px;font-weight:900;letter-spacing:3px;text-transform:uppercase;
+  z-index:15;pointer-events:none;
+}
+
+/* ===== Mensaje final de agradecimiento (fundido suave) ===== */
+/* ===== Modo créditos: pantalla completa, sin interfaz de noticiero ===== */
+#presenter.hide-chrome #bottom-bars{
+  display:none!important;
+}
+#presenter.hide-chrome #clockbox,
+#presenter.hide-chrome #presenter-badge,
+#presenter.hide-chrome #esp-tag,
+#presenter.hide-chrome #ultima-hora-alert,
+#presenter.hide-chrome #topic-photos,
+#presenter.hide-chrome #nav-hint{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+#presenter.hide-chrome #img-area::after,
+#presenter.hide-chrome #img-area::before{
+  display:none!important;
+}
+#presenter.hide-chrome #img-area{
+  border:none!important;
+}
+
+/* ===== Créditos finales (Adios.png) ===== */
+.credits-frame{
+  position:absolute;inset:0;z-index:2;
+  display:flex;flex-direction:column;justify-content:space-between;
+  align-items:center;
+  padding:clamp(28px,4.5vw,64px) clamp(20px,5vw,80px);
+  animation:creditsIn 1.4s ease both;
+}
+@keyframes creditsIn{ from{opacity:0} to{opacity:1} }
+.credits-top{ text-align:center; }
+.credits-kicker{
+  font-family:'Barlow Condensed',sans-serif;
+  color:#FFD700;font-size:clamp(12px,1.4vw,16px);font-weight:800;
+  letter-spacing:7px;text-transform:uppercase;margin-bottom:12px;
+  text-shadow:0 4px 16px rgba(0,0,0,0.9);
+}
+.credits-title{
+  font-family:'Barlow Condensed',sans-serif;
+  color:#fff;font-size:clamp(28px,5vw,60px);font-weight:900;
+  letter-spacing:5px;text-transform:uppercase;
+  text-shadow:0 6px 24px rgba(0,0,0,0.9);
+}
+.credits-title span{ color:#FF0000; text-shadow:0 0 20px #FF0000; }
+.credits-bottom{
+  display:flex;flex-direction:column;align-items:center;gap:20px;
+  text-align:center;
+}
+.credits-thanks{
+  font-family:'Barlow Condensed',sans-serif;
+  color:#fff;font-size:clamp(20px,2.8vw,34px);font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  text-shadow:0 6px 20px rgba(0,0,0,0.9);
+}
+.credits-names{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:12px 16px;
+}
+.credits-name{
+  display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;justify-content:center;
+  border:2px solid #FFD700;background:rgba(0,0,0,0.6);
+  padding:10px 22px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.5);
+}
+.credits-name-main{
+  font-family:'Barlow Condensed',sans-serif;
+  color:#fff;font-size:clamp(13px,1.5vw,17px);font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;
+}
+.credits-name-sep{ color:#FFD700;font-size:13px; }
+.credits-name-role{
+  font-family:'Barlow Condensed',sans-serif;
+  color:#FFD700;font-size:clamp(11px,1.2vw,13px);font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;opacity:0.9;
+}
+.credits-footer{
+  font-family:'Barlow Condensed',sans-serif;
+  color:rgba(255,255,255,0.6);font-size:clamp(11px,1.2vw,13px);
+  font-weight:800;letter-spacing:7px;text-transform:uppercase;
+  margin-top:2px;
+}
+
+/* ===== Pantalla sorpresa de bloopers (aparte de la presentación) ===== */
+#bloopers-info{
+  position:fixed;inset:0;z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(5,0,0,0.97);
+  opacity:0;pointer-events:none;
+  transition:opacity 0.9s ease;
+  cursor:default;
+}
+#bloopers-info.visible{opacity:1;pointer-events:auto}
+.bloopers-box{
+  border:6px double #FFD700;padding:50px 70px;text-align:center;max-width:640px;
+  background:#000;box-shadow:0 0 40px rgba(255,0,0,0.5);
+}
+.bloopers-title{
+  font-family:'Barlow Condensed',sans-serif;color:#FF0000;font-size:32px;
+  font-weight:900;letter-spacing:4px;text-transform:uppercase;margin-bottom:22px;
+}
+.bloopers-text{
+  font-family:'Oswald',sans-serif;color:#fff;font-size:18px;
+  line-height:1.7;letter-spacing:0.5px;
+}
+.bloopers-hint{
+  margin-top:28px;font-family:'Barlow Condensed',sans-serif;color:#FFD700;
+  font-size:14px;letter-spacing:3px;text-transform:uppercase;
+}
+
+/* ===== Reproducción grande del video de bloopers (fundido) ===== */
+#bloopers-video-overlay{
+  position:fixed;inset:0;z-index:600;
+  background:#000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 1.1s ease;
+}
+#bloopers-video-overlay.visible{opacity:1;pointer-events:auto}
+#bloopers-video{width:100%;height:100%;object-fit:contain}
+#bloopers-close-hint{
+  position:absolute;bottom:24px;left:0;right:0;text-align:center;
+  font-family:'Barlow Condensed',sans-serif;color:rgba(255,255,255,0.5);
+  font-size:12px;letter-spacing:3px;text-transform:uppercase;
+}
+#bloopers-error-hint{
+  position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);text-align:center;
+  font-family:'Barlow Condensed',sans-serif;color:#e0393e;
+  font-size:16px;letter-spacing:1px;padding:0 40px;
+}
+
+/* ===== Pantalla final después de los bloopers: busso2.mp4 en bucle + texto con fundido lento ===== */
+#post-bloopers-overlay{
+  position:fixed;inset:0;z-index:650;
+  background:#000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 1.4s ease;
+}
+#post-bloopers-overlay.visible{opacity:1;pointer-events:auto}
+#post-bloopers-video{width:100%;height:100%;object-fit:cover}
+#post-bloopers-text{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:40px;
+  background:rgba(0,0,0,0.4);
+  opacity:0;
+  transition:opacity 7s ease;
+  font-family:'Barlow Condensed',sans-serif;
+  color:#fff;font-size:clamp(24px,4.2vw,56px);font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  text-shadow:0 6px 30px rgba(0,0,0,0.9);
+}
+#post-bloopers-text.visible{opacity:1}
+#post-bloopers-error-hint{
+  position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);text-align:center;
+  font-family:'Barlow Condensed',sans-serif;color:#e0393e;
+  font-size:16px;letter-spacing:1px;padding:0 40px;
+}
+</style>
+</head>
+<body>
+
+<div class="custom-cursor" id="cursor"></div>
+
+<div id="intro">
+  <div class="intro-static"></div>
+  <div class="intro-flag">
+    <div class="flag-white"></div>
+    <div class="flag-blue"></div>
+    <div class="flag-red"></div>
+  </div>
+  <div class="intro-canal">Canal Especial · Historia Soviética</div>
+  <div class="intro-title">CÓDIGO<br><span>KREMLIN</span></div>
+  <div class="intro-sub">Lunik 3 · Cara Oculta · Yuri Gagarin</div>
+  <button class="intro-btn" id="start-btn">▶ &nbsp; Comenzar transmisión</button>
+  <button class="intro-btn" id="manager-btn" style="margin-top:14px;background:#1a1a1a;border-color:#FFD700;font-size:14px;padding:14px 40px;box-shadow:0 0 14px rgba(255,215,0,0.4)">📋 &nbsp; Abrir Manager</button>
+  <div class="intro-hint"> &nbsp;·&nbsp;</div>
+</div>
+
+<div id="presenter">
+
+  <div id="img-area">
+
+    <video id="camera-feed" autoplay muted playsinline></video>
+    <div id="camera-error">
+      <span style="font-size:48px">📷</span>
+      <span>Cámara no disponible</span>
+      <span id="camera-error-msg" style="font-size:13px;color:#888;letter-spacing:2px;max-width:400px;line-height:1.6">Permití el acceso a la cámara en tu navegador y hacé clic en Reintentar</span>
+      <button id="camera-retry-btn" onclick="initCamera()">🔄 &nbsp;Reintentar Cámara</button>
+    </div>
+
+    <div class="slide-bg active" id="bg-0"></div>
+
+    <div class="slide-bg" id="bg-1"></div>
+
+    <div class="slide-bg" id="bg-2"></div>
+
+    <div class="slide-bg" id="bg-3"></div>
+
+    <div class="slide-bg" id="bg-4"></div>
+
+    <div class="slide-bg" id="bg-5"></div>
+
+    <div class="slide-bg" id="bg-6"></div>
+
+    <div class="slide-bg" id="bg-7">
+      <div class="segment-overlay" id="overlay-pausa">
+        <div class="fs-video-wrap">
+          <video class="fs-video" id="fsvideo-pausa" playsinline preload="none">
+            <source src="propaganda.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="fs-video-caption">PAUSA PUBLICITARIA · Código Kremlin</div>
+      </div>
+    </div>
+
+    <div class="slide-bg" id="bg-8"></div>
+
+    <div class="slide-bg" id="bg-9">
+      <div class="fs-video-wrap">
+        <video class="fs-video" id="fsvideo-1" playsinline preload="none">
+          <source src="1.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="fs-video-caption">ENVIADO ESPECIAL · Cosmódromo de Baikonur</div>
+    </div>
+
+    <div class="slide-bg" id="bg-10"></div>
+
+    <div class="slide-bg" id="bg-11">
+      <div class="gagarin-call-frame">
+        <div class="gagarin-call-topbar">
+          <div class="gagarin-live-dot"></div>
+          <div class="gagarin-call-label">LLAMADA EN VIVO</div>
+        </div>
+        <video id="gagarin-video" playsinline preload="none" muted>
+          <source src="busso.mp4" type="video/mp4">
+        </video>
+        <audio id="gagarin-audio" preload="none"></audio>
+        <div class="gagarin-call-bottombar">Baikonur · Vía telefónica</div>
+      </div>
+    </div>
+
+    <div class="slide-bg" id="bg-12"></div>
+
+    <div class="slide-bg" id="bg-13">
+      <div class="fs-video-wrap">
+        <video class="fs-video" id="fsvideo-2" playsinline preload="none">
+          <source src="2.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="fs-video-caption">PILAR EN VIVO · Baikonur</div>
+    </div>
+
+    <div class="slide-bg" id="bg-14"></div>
+
+    <div class="slide-bg has-img" id="bg-15" style="background-image:url('media/Adios.png')">
+      <div class="credits-frame">
+        <div class="credits-top">
+          <div class="credits-kicker">Canal Especial · Historia Soviética</div>
+          <div class="credits-title">CÓDIGO KREMLIN <span>TEAM</span></div>
+        </div>
+        <div class="credits-bottom">
+          <div class="credits-thanks">Muchas gracias por ver nuestra presentación</div>
+          <div class="credits-names">
+            <div class="credits-name">
+              <span class="credits-name-main">Busso Maximo</span>
+              <span class="credits-name-sep">&amp;</span>
+              <span class="credits-name-main">Del Pozo Martiniano</span>
+              <span class="credits-name-role">Presentadores</span>
+            </div>
+            <div class="credits-name">
+              <span class="credits-name-main">Pinto Valentin</span>
+              <span class="credits-name-role">Ingeniero</span>
+            </div>
+            <div class="credits-name">
+              <span class="credits-name-main">Pilar Librandi</span>
+              <span class="credits-name-role">Corresponsal de campo</span>
+            </div>
+            <div class="credits-name">
+              <span class="credits-name-main">Mora Albiero</span>
+              <span class="credits-name-role">Jefecita</span>
+            </div>
+          </div>
+          <div class="credits-footer">MORA DALE AL BOTON AL LADO DE PROXIMA DIAPOSITIVA ESE QUE DICE BLOOPERS SI SI 😭</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ultima-hora-alert">
+      <div class="uh-tag">🔴 ÚLTIMA HORA</div>
+      <div class="uh-text">LA URSS VENCE A CHILE EN UN AMISTOSO · VALENTIN BUBUKIN MARCÓ EL GOL DE LA VICTORIA EN SANTIAGO</div>
+    </div>
+
+    <div class="esp-tag" id="esp-tag">
+      <div class="esp-tag-name" id="esp-name">DR. ALEXEI VOLKOV</div>
+      <div class="esp-tag-role" id="esp-role">Especialista en Exploración Soviética</div>
+    </div>
+
+    <div id="presenter-badge">
+      <div class="pb-role">En Estudio</div>
+      <div class="pb-name" id="pb-name">PRESENTADOR 1</div>
+    </div>
+
+    <div id="clockbox">
+      <div id="clock-time">--:--</div>
+      <div id="clock-temp">--° C</div>
+      <div id="clock-date">-- ---</div>
+      <div id="clock-logo">CÓD. KREMLIN</div>
+    </div>
+
+    <div id="topic-photos">
+      <div class="topic-photo" id="topic-photo-1">
+        <img id="topic-photo-1-img" src="" alt="">
+        <div class="topic-photo-cap" id="topic-photo-1-cap"></div>
+      </div>
+      <div class="topic-photo" id="topic-photo-2">
+        <img id="topic-photo-2-img" src="" alt="">
+        <div class="topic-photo-cap" id="topic-photo-2-cap"></div>
+      </div>
+    </div>
+
+    <div id="nav-hint"></div>
+
+  </div>
+
+  <div id="bottom-bars">
+
+    <div id="bar-thin">
+      <div id="bar-thin-left">CÓDIGO KREMLIN · EMISIÓN ESPECIAL</div>
+      <div id="dots-container"></div>
+      <div id="bar-thin-right">BIENVENIDA AL PROGRAMA</div>
+    </div>
+
+    <div id="bar-main">
+      <div id="bar-arrows-left">☭</div>
+      <div id="bar-headline">
+        <div id="headline-text">BUENOS DÍAS · BIENVENIDOS A CÓDIGO KREMLIN</div>
+      </div>
+      <div id="bar-arrows-right">☭</div>
+    </div>
+
+  </div>
+
+</div>
+
+<div id="bloopers-info">
+  <div class="bloopers-box">
+    <div class="bloopers-title">🎬 Bloopers</div>
+    <div class="bloopers-text">Hola profe, hicimos un video de los bloopers de nuestras grabaciones y nos encantaría mostrárselos.<br><br>Duración: menos de 2 minutos.</div>
+    <div class="bloopers-hint">Presioná ESPACIO para verlo</div>
+  </div>
+</div>
+
+<div id="bloopers-video-overlay">
+  <video id="bloopers-video" playsinline>
+    <source src="bloopers.mp4" type="video/mp4">
+  </video>
+  <div id="bloopers-close-hint"></div>
+  <div id="bloopers-error-hint" style="display:none">No se encontró el archivo "bloopers.mp4". Verificá que esté junto al HTML.</div>
+</div>
+
+<div id="post-bloopers-overlay">
+  <video id="post-bloopers-video" playsinline loop>
+    <source src="busso2.mp4" type="video/mp4">
+  </video>
+  <div id="post-bloopers-text">Ya terminamos la presentación<br>no hay nada más 🥶</div>
+  <div id="post-bloopers-error-hint" style="display:none">No se encontró el archivo "busso2.mp4". Verificá que esté junto al HTML.</div>
+</div>
+
+<script>
+function initCamera(){
+  const video = document.getElementById('camera-feed');
+  const errBox = document.getElementById('camera-error');
+  const errMsg = document.getElementById('camera-error-msg');
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    errMsg.textContent = 'Tu navegador no soporta acceso a cámara. Probá con Chrome o Firefox.';
+    errBox.style.display = 'flex';
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width:{ideal:1280}, height:{ideal:720} }, audio: false })
+    .then(stream => {
+      // Detener stream anterior si había
+      if(video.srcObject){ video.srcObject.getTracks().forEach(t => t.stop()); }
+      video.srcObject = stream;
+      video.play().catch(()=>{});
+      errBox.style.display = 'none';
+      // Actualizar indicador en manager si está abierto
+      if(managerWin && !managerWin.closed){
+        managerWin.postMessage({ type: 'KREMLIN_CAM_OK' }, '*');
+      }
+    })
+    .catch(err => {
+      console.warn('Cámara no disponible:', err);
+      let msg = 'Permití el acceso a la cámara en tu navegador y hacé clic en Reintentar.';
+      if(err.name === 'NotAllowedError') msg = 'Acceso denegado. Habilitá la cámara en los permisos del sitio (🔒 en la barra de direcciones) y hacé clic en Reintentar.';
+      else if(err.name === 'NotFoundError') msg = 'No se encontró ninguna cámara conectada al dispositivo.';
+      else if(err.name === 'NotReadableError') msg = 'La cámara está siendo usada por otra aplicación. Cerrala y reintentá.';
+      if(errMsg) errMsg.textContent = msg;
+      errBox.style.display = 'flex';
+      // Notificar al manager
+      if(managerWin && !managerWin.closed){
+        managerWin.postMessage({ type: 'KREMLIN_CAM_ERR' }, '*');
+      }
+    });
+}
+// Inicializar al cargar — llamado después de definir managerWin más abajo
+
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top = e.clientY + 'px';
+});
+document.addEventListener('mousedown', () => cur.classList.add('click'));
+document.addEventListener('mouseup', () => cur.classList.remove('click'));
+
+const slides = [
+  {
+    cat:       "BIENVENIDA AL PROGRAMA",
+    headline:  "BUENOS DÍAS · BIENVENIDOS A CÓDIGO KREMLIN",
+    esp: null,
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    script: `MAXI: Buen día, soviéticos, ¿cómo están? Esperamos que excelente. Nosotros con frío acá en Código Kremlin, ¿no Martiniano?
+MARTINIANO: Sisi, últimamente ha estado muy frío.`
+  },
+  {
+    cat:       "CLIMA Y CONDICIONES",
+    headline:  "EL TIEMPO HOY EN LA TRANSMISIÓN",
+    esp: null,
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    script: `MARTINIANO: El clima de hoy: 5°C acá en Moscú a esta hora. A las 14:00 harán alrededor de 9°C, y en la noche volverá a refrescar con 3°C.
+MAXI: Como siempre, frío todo el día. Igualmente, hoy es un día muy importante para la Unión Soviética: hoy el cosmonauta Busso Gagarin será enviado al espacio, increíble.
+MARTINIANO: Sí, la verdad sorprendente. Aparte de ese excelente evento de hoy, ya pasó un año y cinco meses del lanzamiento del Lunik 3.`
+  },
+  {
+    cat:       "TEMA PRINCIPAL",
+    headline:  "LA CARA OCULTA DE LA LUNA: UN MISTERIO REVELADO EN 1959",
+    esp: null,
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    photos: [{ src:"media/lunik.jpeg", cap:"LUNIK 3" }],
+    script: `MAXI: No se puede creer lo rápido que pasa el tiempo. El Lunik 3 se lanzó un 4 de octubre de 1959. ¿Te acordás por qué esa fecha? Porque era el segundo aniversario del Sputnik 1.
+MARTINIANO: Ahh, tenés razón.
+MAXI: Fue un tiempo político perfecto para dejar mudos a los americanos y demostrar que nuestro programa no descansa.`
+  },
+  {
+    cat:       "LUNIK 3 · LA MISIÓN",
+    headline:  "LUNIK 3: PRIMERA SONDA EN FOTOGRAFIAR LA CARA OCULTA DE LA LUNA",
+    esp: null,
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    photos: [{ src:"media/luna.jpeg", cap:"LA LUNA" }],
+    script: `MARTINIANO: Sisi, aparte, el cohete salió desde el Cosmódromo de Baikonur el 4 de octubre. El viaje estuvo calculado para usar la propia gravedad de la Luna para dar la vuelta.
+MAXI: ¿En serio? Mirá, no sabía esa yo.
+MARTINIANO: Sisi, y el 6 de octubre la sonda pasó a unos 6.200 kilómetros del polo sur de la Luna, y al día siguiente, el 7 de octubre, se acomodó justo de frente al lado oculto cuando el Sol le daba de lleno. Ahí arrancaron las fotos.
+MAXI: Los yanquis todavía no lo pueden creer. Con lo paranoicos que están en Washington, pensaban que íbamos a poner una base militar o algo así. La sesión de fotos de ese día duró re poco, ¿no? ¿Cuántas fotos sacó al final en ese rato?
+MARTINIANO: Sí, la sesión duró apenas 40 minutos en total. En ese tiempito la sonda sacó 29 fotos que cubrieron más o menos el 70% de la cara oculta de la Luna.`
+  },
+  {
+    cat:       "IMÁGENES HISTÓRICAS",
+    headline:  "¡LAS PRIMERAS FOTOS DE LA CARA OCULTA! · 7 DE OCTUBRE DE 1959",
+    esp: null,
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    photos: [{ src:"media/luna.jpeg", cap:"LA LUNA" }],
+    script: `MAXI: En tan poco tiempo, ¡qué increíble!
+MARTINIANO: Pensá que era una zona que ningún ser humano en la historia de la humanidad había visto jamás. Pero lo más importante de las fechas vino después, en el viaje de vuelta hacia la Tierra. Las fotos no llegaron al toque: las estaciones de radio que armamos en Crimea recién empezaron a recibir las señales entre el 18 y el 22 de octubre, cuando la sonda se venía acercando.
+MAXI: Tardaron bastante, pero valió la pena el esfuerzo: el 27 de octubre de 1959 las publicamos acá, en la portada de Pravda. Ese día les ganamos la geografía del espacio en la cara. Los científicos de Estados Unidos se quisieron morir porque tuvimos el derecho oficial de poner los nombres que quisimos a todo lo nuevo que apareció en el mapa.
+MARTINIANO: Claro, fue una victoria política enorme que todavía les duele. También les pusimos nombre ruso a las cosas más importantes que descubrimos: el Mar de Moscú, el Mar del Deseo y la Cordillera de los Cosmonautas. En los diarios de Occidente salieron a decir que las fotos eran un asco, que se veían borrosas y llenas de rayas, pero la realidad es que no pudieron desmentir el mapa. Estaban re calientes.
+MAXI: Estos datos nunca hay que dejarlos de lado, fueron y son muy importantes para la historia soviética. Por el aniversario de este increíble lanzamiento del Cosmódromo, tenemos un invitado.
+MARTINIANO: Sí, alguien muy importante para ese Cosmódromo. Un placer tener al físico Valentin Rauschenbach.`
+  },
+  {
+    cat:       "ESPECIALISTA EN ESTUDIO",
+    headline:  "ANÁLISIS EXPERTO · DR. Valentin Rauschenbach",
+    esp: { name:"DR. Valentin Rauschenbach", role:"Especialista en Exploración Soviética" },
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    photos: [{ src:"media/capsula.jpeg", cap:"CÁPSULA" }, { src:"media/calculo.jpeg", cap:"CÁLCULO DE ÓRBITA" }],
+    script: `VALENTIN: Hola, la verdad es que excelente. Tuve muchos agradecimientos por ayudar con la formación del Lunik 3.
+MARTINIANO: Bueno, lo que realmente queremos es que nos des información sobre la parte ingeniera, física y matemática del Lunik 3, y si nos permitís te haremos un par de preguntas a medida que hables.
+VALENTIN: Por supuesto. A los físicos nos gusta hablar con ecuaciones, pero hoy lo bajamos a la tierra. A ver, piensen en el gran dolor de cabeza matemático que tuvimos: la órbita. No podíamos simplemente tirar la sonda en línea recta hacia la Luna. Diseñamos una trayectoria matemática inédita que los astrónomos llaman "asistencia gravitatoria" u órbita baricéntrica alargada.
+MAXI: Explique eso de manera más sencilla, por favor. ¿Cómo funciona la física ahí?
+VALENTIN: Muy simple. Usamos la propia gravedad de la Luna como si fuera una honda. La física del viaje consistió en lanzar la sonda de modo que pasara por debajo del polo sur de la Luna, a unos 7.800 kilómetros del centro. Al pasar por ahí, la tremenda fuerza de gravedad lunar tironeó de la sonda, curvó su trayectoria de forma natural y la desvió hacia el norte. Esa carambola matemática hizo que la sonda regresara solita hacia la Tierra sin gastar una gota de combustible.
+MARTINIANO: Pero ahora vamos a lo suyo, la orientación. Porque la física de la órbita no sirve de nada si la cámara apunta para cualquier lado y le saca una foto al vacío negro. ¿Cómo hicieron para que una lata flotante apuntara exacto a la Luna?
+VALENTIN: El aparato flotaba en el espacio girando sobre su propio eje. Para sacar la foto, primero teníamos que frenar ese giro por completo usando motores de gas frío. Una vez quieta, la sonda usó sensores ópticos: uno buscó la luz del Sol y el otro buscó la Luna. Cuando el sensor detectó el brillo de la Luna, la computadora de a bordo supo que estaba apuntando de frente. En ese instante, la cubierta de la cámara se abrió y se activó el mecanismo automatizado.
+MAXI: Su compañero, el ingeniero Boguslavskiy, mencionó que las fotos salieron con muy bajo contraste por un tema de la iluminación y la potencia. ¿Eso fue un error de cálculo matemático en el momento de disparar la cámara?
+VALENTIN: No fue un error de cálculo, Máximo, fue una decisión de diseño bajo una presión de tiempo tremenda. Para que los sensores ópticos de orientación funcionaran sin confundirse, la sonda tenía que estar exactamente entre el Sol y la Luna. Eso significaba que la Luna estaba completamente iluminada desde arriba para la cámara. Cualquiera que sepa un poco de fotografía sabe que en una Luna llena no hay sombras, y sin sombras, no hay contraste. Además, tuvimos que usar electrónica basada en transistores. Todo el mundo nos decía que era un riesgo gigantesco para la época, pero era la única forma de que los circuitos soportaran el viaje.
+MARTINIANO: Mire ese gráfico, ¿nos lo querría explicar?
+VALENTIN: Por supuesto. Miren la derecha del gráfico: esa esfera chica es la Tierra. La línea recta que sale hacia la izquierda es el Lunik alejándose el 5 de octubre. Fíjense abajo a la izquierda: el 7 de octubre, la sonda pasa por debajo de la Luna y la gravedad pega el tirón hacia arriba. Los puntos azules son las estaciones de control nuestras en Kochka, allá en Crimea, donde recibíamos los datos limpios. Y los bloques rojos... bueno, los bloques rojos demuestran que no pudimos ocultar el viaje. Son los momentos en que el telescopio británico de Jodrell Bank nos detectó y captó la señal desde el extranjero.
+MAXI: ¿Y si hablamos de la formación del Cosmódromo?
+VALENTIN: Imagínense un cilindro lleno de gas nitrógeno a presión constante para que los equipos no se congelen ni se quemen. Por fuera, el Lunik estaba rodeado por cuatro grandes paneles solares que le daban energía a las baterías químicas de adentro, y también tenía esos tubos largos que son las antenas de radio para mandar las señales a la Tierra.
+MARTINIANO: ¿Y los motores para moverse? Porque en el espacio no hay aire para doblar. ¿Cómo giraba el aparato sobre su propio eje?
+VALENTIN: Usamos un sistema de propulsión muy ingenioso y delicado. Tenía unos micro-motores que funcionaban expulsando chorros de gas nitrógeno comprimido. No eran motores gigantescos de combustión, sino pequeñas boquillas externas que soltaban soplos de gas para empujar la sonda milimétricamente hacia un lado o hacia el otro. Además, para que la computadora interna supiera qué hacer con esos motores, el Lunik llevaba unos giroscopios mecánicos adentro que medían la velocidad de rotación. Cuando el giroscopio decía que la sonda se había frenado del todo, los motores de gas se apagaban.
+MAXI: O sea que soplaba gas para acomodarse. ¿Y la cámara? Porque si está expuesta al espacio todo el viaje, el lente se destruye con el polvo cósmico o los cambios de temperatura antes de llegar a la Luna.
+VALENTIN: Exacto, Maxi. Por eso la cámara no estaba al aire libre. Estaba protegida dentro del cuerpo cilíndrico, detrás de una ventana de vidrio especial. Y para proteger ese vidrio durante el viaje, diseñamos una tapa o compuerta mecánica automatizada. Esa tapa solo se abría mediante un motor eléctrico en el instante preciso en que los sensores ópticos confirmaban que la Luna estaba de frente. Cuando terminaba la sesión de fotos, la compuerta se volvía a cerrar herméticamente.
+MARTINIANO: Bueno Valentin, fue un gusto tenerte con nosotros acá, espero que te vaya muy muy bien.
+MAXI: Un gusto haberlo tenido, camarada, una información muy muy útil, lo veremos pronto.
+VALENTIN: Un gusto haber estado acá en Código Kremlin.`
+  },
+  {
+    cat:       "🔴 ÚLTIMA HORA",
+    headline:  "ÚLTIMA HORA: LA URSS VENCE A CHILE EN UN AMISTOSO DE FÚTBOL",
+    esp: null,
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: true,
+    photos: [{ src:"media/futbool.jpeg", cap:"FÚTBOL" }],
+    script: `MARTINIANO: Acabamos de recibir unas noticias de última hora: en Santiago de Chile se estuvo jugando un amistoso de la Unión Soviética contra Chile, y nuestro excelente jugador Valentin Bubukin marcó el gol que nos hizo ganar.
+MAXI: ¿En serio? Los dejamos llorando a los chilenos un tiempo antes del Mundial. No importa igual, acordate que el Mundial lo gana Brasil.
+MARTINIANO: ¿Vos decís? Yo le tengo fe a muchos equipos, pero hay que decir la verdad: tienen a muchos jugadores como Pelé, por ejemplo.
+MAXI: Qué jugador, Pelé.
+MAXI: Bueno, nos vamos a una pausa publicitaria y nos vemos con la corresponsal de campo, Pilar Librandi, a ver qué dice la gente sobre el Lunik 3.`
+  },
+  {
+    cat:       "PAUSA PUBLICITARIA",
+    headline:  "REGRESAMOS EN BREVE · CÓDIGO KREMLIN CONTINÚA",
+    esp: null,
+    badge: null,
+    ultimaHora: false,
+    script: `PAUSA PUBLICITARIA`
+  },
+  {
+    cat:       "ENVIADO ESPECIAL · EN CAMPO",
+    headline:  "VIDEO EXCLUSIVO: NUESTRO CORRESPONSAL EN EL COSMÓDROMO DE BAIKONUR",
+    esp: null,
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    script: `
+MAXI: Bueno ahora en vivo desde beirut
+`
+  },
+  {
+    cat:       "ENVIADO ESPECIAL · EN CAMPO",
+    headline:  "VIDEO EXCLUSIVO: NUESTRO CORRESPONSAL EN EL COSMÓDROMO DE BAIKONUR",
+    esp: null,
+    badge: null,
+    ultimaHora: false,
+    script: `PILAR: Bueno, acá estamos cerca del Cosmódromo de Baikonur... (se traba)
+MARTINIANO: Pilu, medio que se traba un poco.
+PILAR: (todo trabado) Uh, ¿en serio?
+MAXI: Sí, a ver, hablá de nuevo.
+PILAR: ¿Ahí?
+MARTINIANO: Listo, se escucha perfecto.
+PILAR: Bueno, hoy estamos cerca de Baikonur viendo si la gente recuerda algo del Lunik 3. Como dijeron mis compañeros, fue el satélite que le sacó una foto a la parte trasera de la Luna, algo increíble para el momento.
+[Se cruza alguien]
+PILAR: Hola, ¿cómo andás?
+ENTREVISTADO: Hola, bien.
+PILAR: ¿Te acordás algo del Lunik 3?
+ENTREVISTADO: Ehhh, algo tengo creo. ¿Esto sale en televisión?
+PILAR: Eh, sí.
+ENTREVISTADO: Un saludo para mi papá, mamá, abuela, abuelo y hermanos. Nunca salí en la tele y vi a alguien como vos.
+PILAR: Bueno, a la pregunta: ¿sabés algo?
+ENTREVISTADO: Eh, fue un satélite que sacó una foto a la parte de atrás de la Luna y, eh, también que tardó mucho en llegar acá las fotos.
+PILAR: Muy buena la información, es algo que nunca se vio antes. Muchas gracias por responder.
+PILAR: También, el observatorio inglés de Jodrell Bank era el único en Occidente con una antena gigante capaz de escuchar a la sonda. Los soviéticos no les querían dar las frecuencias exactas por puro secreto militar, así que los ingleses tuvieron que andar "cazando" la señal en el aire hasta que la engancharon.
+MAXI: Gracias, Pilu, por la información. Nos vemos en un rato.`
+  },
+  {
+    cat:       "Busso GAGARIN · EL HÉROE DEL COSMOS",
+    headline:  "GAGARIN: EL PRIMER SER HUMANO EN VER LA TIERRA DESDE EL ESPACIO",
+    esp: { name:"Busso GAGARIN", role:"Primer Hombre en el Espacio · 1961" },
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    photos: [{ src:"media/maxi.jpeg", cap:"MAXI" }],
+    script: `MARTINIANO: Bueno, medio que no sabía mucho la chica.
+MAXI: Un poco perdida, pero como todos. Ya dentro de un rato se va Busso Gagarin al espacio, ¡qué increíble, no!
+MARTINIANO: Sí, algo nunca antes visto, siempre haciendo cosas nuevas la Unión Soviética. Maxi, ¿nos querrías dar un poco de información sobre Gagarin?
+MAXI: Por supuesto. Hay que destacar que es un auténtico hijo del pueblo y del socialismo. Nació en una granja colectiva, en un pueblo llamado Klúshino. Su papá era carpintero y su mamá tambera. El tipo no viene de la aristocracia ni de los millones; es un obrero metalúrgico que se formó en una escuela técnica de fundición y después se metió en la Fuerza Aérea. Tiene 27 años, mide 1,57 metros...
+MARTINIANO: Pará, ¿1,57 metros? ¿Por qué tan petiso? La gente se imagina a los héroes soviéticos como gigantes de dos metros.
+MAXI: Es física pura. La cabina de la cápsula Vostok 1 es una bola de metal re chica. Adentro casi no hay lugar por los equipos y los paracaídas. Si poníamos a un tipo alto, no entraba en el asiento eyectable o se golpeaba las rodillas contra el tablero de control.
+MARTINIANO: Ah, y Gagarin tiene el tamaño perfecto, y pasó los entrenamientos de resistencia en la centrífuga sin pestañear. Además, los médicos dicen que tiene una sonrisa que desarma a cualquiera, ideal para las fotos de portada de los diarios de todo el mundo.
+MAXI: Un obrero con sonrisa de estrella de cine, perfecto para la propaganda. Ahora decime, ¿qué es todo lo que lleva encima adentro de esa cápsula? Porque va a estar flotando en la nada total y hay que explicarle a la gente cómo va a sobrevivir ahí arriba.
+MARTINIANO: Va blindado de pies a cabeza, Marti. Lleva un traje espacial autónomo de color naranja brillante, re llamativo, para que si cae en el medio de la nada, los equipos de rescate lo vean al toque desde los aviones. El casco es blanco, y le pintamos las letras "URSS" en la frente a último momento con pintura roja para que nadie lo confunda con un espía yanqui cuando baje.
+MAXI: Lleva raciones especiales para diez días, por si el motor de frenado falla y hay que esperar a que la órbita decaiga sola por el roce del aire. Lo gracioso es la comida: va en tubos de aluminio apretables, como si fuesen pasta de dientes. Lleva tres tubos: dos de puré de carne con hígado y uno de salsa de chocolate de postre. Para tomar agua tiene un sistema de succión con una manguerita adentro del casco.
+MARTINIANO: Ahí me conecto con Busso Gagarin.
+MAXI: ¿Camarada Gagarin? Habla Maxi, desde el canal Código Kremlin. Sé que está a minutos de subir a la rampa, pero el pueblo soviético necesita escucharlo antes de que toque el cielo. ¿Cómo está el ánimo ahí adentro?`
+  },
+  {
+    cat:       "LLAMADA EN VIVO · MINUTOS ANTES DEL LANZAMIENTO",
+    headline:  "EN VIVO: BUSSO GAGARIN HABLA ANTES DE SUBIR A LA RAMPA",
+    esp: { name:"Busso GAGARIN", role:"Vía telefónica desde Baikonur" },
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    script: `
+GAGARIN: ¡Hola! Qué alegría escucharlos. El ánimo está bárbaro, re tranquilo. Los técnicos me están ajustando los últimos tornillos del casco blanco. La verdad, me siento como un estudiante antes de un examen final muy importante, pero con total confianza en los ingenieros que armaron esta maravilla.
+MARTINIANO: ¡Camarada Busso! Qué orgullo. Queremos que nos cuente de primera mano, pero sin palabras difíciles: ¿qué es lo primero que va a hacer cuando el cohete encienda los motores? Porque la gente se imagina que usted va a estar manejando un volante ahí adentro.
+GAGARIN: ¡No, no! Nada de volantes. El vuelo es 100% automático, manejado por las computadoras desde la Tierra. Yo voy más que nada de testigo y de piloto de pruebas, para ver si el cuerpo humano aguanta estar sin gravedad. Lo primero que voy a sentir es un temblor tremendo y una fuerza que me va a aplastar contra el asiento. En ese momento me voy a reportar por radio para avisar que todo va bien. Si todo sale según el cálculo de los científicos, voy a dar una vuelta completa al planeta en menos de dos horas.
+MAXI: Una hora y cuarenta y ocho minutos, nos dijeron. Una locura. Busso, dígame la verdad: ¿no le da un poco de miedo estar ahí arriba, flotando solo en la negrura del espacio? ¿Qué va a hacer si se aburre o si se siente raro?
+GAGARIN: ¿Aburrirme? ¡Para nada! Voy a estar re ocupado mirando por las ventanillas de la cápsula. Tengo que registrar todo: cómo se ve la atmósfera, cómo se ven las nubes y los continentes desde arriba. Además, tengo que cumplir con tareas simples para los médicos, como probar que puedo tomar agua de la manguerita del casco y comer la comida en tubos de aluminio, para ver si se puede tragar bien sin gravedad.
+MARTINIANO: ¡Esperamos ese reporte gastronómico! Dígame, camarada, ¿qué es lo que lleva con usted en el traje que considere más importante?
+GAGARIN: Además de los mapas mecánicos, la radio y el equipo de supervivencia por si caigo en el bosque, lo más importante que llevo es el orgullo de todos los trabajadores soviéticos. Sé que mi papá, que es carpintero, y mis compañeros de la fábrica de fundición van a estar leyendo su diario mañana. Llevo la representación de nuestra gente. Ah, y por seguridad, los muchachos me pintaron "URSS" con pintura roja en el casco hace un ratito, para que cuando baje en paracaídas la gente del campo sepa al toque que soy uno de los nuestros.
+MAXI: Estamos re contentos acá en Moscú, Busso. Todo el país va a estar empujando ese cohete con el pensamiento hoy. Cuando escuchemos el motor, vamos a gritar con usted.
+GAGARIN: Bueno, me están llamando para ir a la rampa... ¡Nos vemos en un rato, cuando vuelva a pisar suelo soviético!
+MARTINIANO Y MAXI: ¡Buena suerte, Busso! ¡El cosmos es nuestro!`
+  },
+  {
+    cat:       "CORRESPONSAL · EN VIVO DESDE EL LANZAMIENTO",
+    headline:  "PILAR EN VIVO: EL DESPEGUE DE GAGARIN DESDE BAIKONUR",
+    esp: { name:"Pilar Ivanov", role:"Cosmódromo de Baikonur · En vivo" },
+    badge: null,
+    ultimaHora: false,
+    photos: [{ src:"media/yuri.jpeg", cap:"YURI GAGARIN" }],
+    script: `MARTINIANO: Buena onda el tipo, ¿eh?
+MAXI: Sí, la verdad que sí. Ahí nos conectamos con Pilu para ver el lanzamiento de Gagarin.
+`
+  },
+  {
+    cat:       "CORRESPONSAL · EN VIVO DESDE EL LANZAMIENTO",
+    headline:  "PILAR EN VIVO: EL DESPEGUE DE GAGARIN DESDE BAIKONUR",
+    esp: null,
+    badge: null,
+    ultimaHora: false,
+    script: `PILAR: ¡Hola! Estoy en el Cosmódromo de Baikonur, ¡ya está por despegar Busso!
+PILAR: La verdad, increíble verlo en persona, es mucho más distinto que verlo por un video. La verdad, experiencia única y hermosa.
+MARTINIANO: ¿En serio, Pilu? Debe ser hermoso.
+PILAR: Muy linda experiencia, Martiniano. La verdad, verlo acá despegar fue una experiencia inolvidable.
+MAXI: Bueno, Pilar, ¡muchas gracias por estar ahí y mostrarnos!
+PILAR: ¡Sí! ¡Nos vemos!`
+  },
+  {
+    cat:       "CIERRE DEL PROGRAMA",
+    headline:  "GRACIAS POR VER CÓDIGO KREMLIN · HASTA LA PRÓXIMA EMISIÓN",
+    esp: null,
+    badge: { role:"En Estudio", name:"Maximo Mironov Y Martiniano Valkov" },
+    ultimaHora: false,
+    script: `MARTINIANO: Bueno, el programa de hoy de Código Kremlin fue hermoso, charlas con mucha gente.
+MAXI: Sí, la verdad que la pasé muy muy bien, muy bueno. Nos despedimos de parte de Código Kremlin.
+MAXI Y MARTINIANO: ¡Chau, chau, chau, chauuuuuuuuu!`
+  },
+  {
+    cat:       "",
+    headline:  "",
+    esp: null,
+    badge: null,
+    ultimaHora: false,
+    script: `(Créditos finales en pantalla: agradecimiento y nombres del equipo)`
+  }
+];
+
+let current = 0;
+let started = false;
+let uhShown = false;
+
+const CLOSING_SLIDE_INDEX = 14; // último segmento real del programa ("CIERRE DEL PROGRAMA")
+const CREDITS_SLIDE_INDEX = 15; // diapositiva de créditos finales
+
+function updateClock(){
+  const n = new Date();
+  const h = String(n.getHours()).padStart(2,'0');
+  const m = String(n.getMinutes()).padStart(2,'0');
+  const months = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+  document.getElementById('clock-time').textContent = h + ':' + m;
+  document.getElementById('clock-date').textContent = n.getDate() + ' ' + months[n.getMonth()];
+  const temps = ['-8° C','-5° C','-3° C','-6° C'];
+  document.getElementById('clock-temp').textContent = temps[n.getSeconds() % 4];
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function buildDots(){
+  const c = document.getElementById('dots-container');
+  c.innerHTML = '';
+  slides.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'cdot' + (i === current ? ' active' : '');
+    d.title = 'Segmento ' + (i+1);
+    d.onclick = e => { e.stopPropagation(); goTo(i); };
+    c.appendChild(d);
+  });
+}
+
+function renderSlide(){
+  const s = slides[current];
+
+  document.querySelectorAll('.slide-bg').forEach((el,i) => {
+    el.classList.toggle('active', i === current);
+  });
+
+  const ht = document.getElementById('headline-text');
+  ht.style.animation = 'none';
+  void ht.offsetWidth;
+  ht.textContent = s.headline;
+
+  document.getElementById('bar-thin-right').textContent = s.cat;
+
+  const espTag = document.getElementById('esp-tag');
+  if(s.esp){
+    document.getElementById('esp-name').textContent = s.esp.name;
+    document.getElementById('esp-role').textContent = s.esp.role;
+    espTag.classList.add('visible');
+  } else {
+    espTag.classList.remove('visible');
+  }
+
+  const pbadge = document.getElementById('presenter-badge');
+  if(s.badge){
+    document.getElementById('pb-name').textContent = s.badge.name;
+    pbadge.querySelector('.pb-role').textContent = s.badge.role;
+    pbadge.classList.add('visible');
+  } else {
+    pbadge.classList.remove('visible');
+  }
+
+  const photos = s.photos || [];
+  for(let n = 0; n < 2; n++){
+    const box = document.getElementById('topic-photo-' + (n + 1));
+    const img = document.getElementById('topic-photo-' + (n + 1) + '-img');
+    const cap = document.getElementById('topic-photo-' + (n + 1) + '-cap');
+    if(photos[n]){
+      img.src = photos[n].src;
+      img.alt = photos[n].cap || '';
+      cap.textContent = photos[n].cap || '';
+      box.classList.add('visible');
+    } else {
+      box.classList.remove('visible');
+    }
+  }
+
+  const uh = document.getElementById('ultima-hora-alert');
+  if(s.ultimaHora){
+    uh.classList.add('visible');
+    if(!uhShown){
+      uhShown = true;
+      setTimeout(() => uh.classList.remove('visible'), 8000);
+    }
+  } else {
+    uh.classList.remove('visible');
+  }
+
+  const overlayPausa = document.getElementById('overlay-pausa');
+  const overlayVideo = document.getElementById('overlay-video');
+  if(overlayPausa) overlayPausa.classList.toggle('visible', current === 7);
+  if(overlayVideo) overlayVideo.classList.toggle('visible', current === 8);
+
+  const presenterEl = document.getElementById('presenter');
+  if(presenterEl) presenterEl.classList.toggle('hide-chrome', current >= CREDITS_SLIDE_INDEX);
+
+  manageFsVideos();
+  buildDots();
+}
+
+/* ===== Videos a pantalla completa (propaganda.mp4, 1.mp4, 2.mp4) =====
+   Reproduce el video del slide-bg activo y pausa/reinicia el resto. */
+function manageFsVideos(){
+  document.querySelectorAll('.slide-bg').forEach((bg, i) => {
+    bg.querySelectorAll('video.fs-video').forEach(v => {
+      if(i === current){
+        v.currentTime = 0;
+        const playPromise = v.play();
+        if(playPromise && playPromise.catch){
+          playPromise.catch(() => { /* el navegador puede bloquear el autoplay con sonido; se puede reintentar con un click */ });
+        }
+      } else {
+        v.pause();
+        v.currentTime = 0;
+      }
+    });
+  });
+}
+
+/* ===== Segmento de la llamada de Gagarin: video mudo (busso.mp4) + 5 audios (audio/1.mp3 .. audio/5.mp3) =====
+   Al llegar al slide se reproduce el video en loop junto con audio/1.mp3.
+   Cuando ese mp3 termina, el video se pausa. Al presionar espacio se reinicia
+   el video (desde el principio) junto con el siguiente mp3, hasta agotar los 5.
+   Recién ahí el espacio vuelve a avanzar de diapositiva normalmente. */
+const GAGARIN_SLIDE_INDEX = 11;
+const GAGARIN_AUDIOS = ['audio/1.mp3', 'audio/2.mp3', 'audio/3.mp3', 'audio/4.mp3', 'audio/5.mp3'];
+let gagarinStep = 0; // cantidad de mp3 ya reproducidos/en reproducción (0..5)
+
+function gagarinEls(){
+  return { video: document.getElementById('gagarin-video'), audio: document.getElementById('gagarin-audio') };
+}
+
+function playGagarinStep(n){
+  const { video, audio } = gagarinEls();
+  if(!video || !audio) return;
+  audio.src = GAGARIN_AUDIOS[n];
+  video.loop = true;
+  video.currentTime = 0;
+  const vp = video.play();
+  if(vp && vp.catch) vp.catch(() => {});
+  audio.currentTime = 0;
+  const ap = audio.play();
+  if(ap && ap.catch) ap.catch(() => {});
+}
+
+function stopGagarin(){
+  const { video, audio } = gagarinEls();
+  if(video){ video.pause(); video.currentTime = 0; video.loop = false; }
+  if(audio){ audio.pause(); audio.currentTime = 0; audio.removeAttribute('src'); audio.load(); }
+  gagarinStep = 0;
+}
+
+(function(){
+  const { audio } = gagarinEls();
+  if(!audio) return;
+  audio.addEventListener('ended', function(){
+    const { video } = gagarinEls();
+    if(video){ video.loop = false; video.pause(); }
+  });
+})();
+
+/* Devuelve true si consumió el "espacio" dentro del segmento de Gagarin (no avanza de diapositiva). */
+function handleGagarinAdvance(){
+  if(current !== GAGARIN_SLIDE_INDEX) return false;
+  if(gagarinStep >= GAGARIN_AUDIOS.length) return false; // los 5 ya se reprodujeron, dejar avanzar
+  const { audio } = gagarinEls();
+  if(audio && !audio.paused && !audio.ended){
+    return true; // todavía sonando el mp3 actual: ignorar el espacio
+  }
+  gagarinStep++;
+  if(gagarinStep < GAGARIN_AUDIOS.length){
+    playGagarinStep(gagarinStep);
+    return true;
+  }
+  return false; // se acaban de terminar los 5: dejar que este espacio avance de diapositiva
+}
+
+let bloopersInfoShown = false;
+let bloopersVideoShown = false;
+
+function showBloopersInfo(){
+  if(bloopersInfoShown) return;
+  bloopersInfoShown = true;
+  const el = document.getElementById('bloopers-info');
+  if(el) el.classList.add('visible');
+}
+
+function hideBloopersInfo(){
+  bloopersInfoShown = false;
+  const el = document.getElementById('bloopers-info');
+  if(el) el.classList.remove('visible');
+}
+
+function showBloopersVideo(){
+  if(bloopersVideoShown) return;
+  bloopersVideoShown = true;
+  hideBloopersInfo();
+  const overlay = document.getElementById('bloopers-video-overlay');
+  const vid = document.getElementById('bloopers-video');
+  const errHint = document.getElementById('bloopers-error-hint');
+  if(errHint) errHint.style.display = 'none';
+  if(overlay) overlay.classList.add('visible');
+  if(vid){
+    vid.currentTime = 0;
+    vid.play().catch(()=>{
+      if(errHint) errHint.style.display = 'block';
+    });
+  }
+}
+
+function hideBloopersVideo(){
+  bloopersVideoShown = false;
+  const overlay = document.getElementById('bloopers-video-overlay');
+  const vid = document.getElementById('bloopers-video');
+  if(vid){ vid.pause(); vid.currentTime = 0; }
+  if(overlay) overlay.classList.remove('visible');
+}
+
+(function(){
+  const vid = document.getElementById('bloopers-video');
+  if(vid) vid.addEventListener('ended', handleBloopersEnded);
+  if(vid) vid.addEventListener('error', () => {
+    const hint = document.getElementById('bloopers-error-hint');
+    if(hint) hint.style.display = 'block';
+  });
+})();
+
+let postBloopersShown = false;
+
+function handleBloopersEnded(){
+  bloopersVideoShown = false;
+  const overlay = document.getElementById('bloopers-video-overlay');
+  const vid = document.getElementById('bloopers-video');
+  if(vid){ vid.pause(); vid.currentTime = 0; }
+  if(overlay) overlay.classList.remove('visible');
+  showPostBloopersOutro();
+}
+
+function showPostBloopersOutro(){
+  if(postBloopersShown) return;
+  postBloopersShown = true;
+  const overlay = document.getElementById('post-bloopers-overlay');
+  const vid = document.getElementById('post-bloopers-video');
+  const txt = document.getElementById('post-bloopers-text');
+  const errHint = document.getElementById('post-bloopers-error-hint');
+  if(txt) txt.classList.remove('visible');
+  if(errHint) errHint.style.display = 'none';
+  if(overlay) overlay.classList.add('visible');
+  if(vid){
+    vid.currentTime = 0;
+    vid.loop = true;
+    vid.play().catch(()=>{
+      if(errHint) errHint.style.display = 'block';
+    });
+  }
+  // Fundido bien lento del texto, arranca un instante después de que empieza el video
+  if(txt){
+    setTimeout(() => txt.classList.add('visible'), 1200);
+  }
+}
+
+function hidePostBloopersOutro(){
+  postBloopersShown = false;
+  const overlay = document.getElementById('post-bloopers-overlay');
+  const vid = document.getElementById('post-bloopers-video');
+  const txt = document.getElementById('post-bloopers-text');
+  if(vid){ vid.pause(); vid.currentTime = 0; vid.loop = false; }
+  if(overlay) overlay.classList.remove('visible');
+  if(txt) txt.classList.remove('visible');
+}
+
+function goTo(i){
+  current = Math.max(0, Math.min(i, slides.length - 1));
+  renderSlide();
+  if(current === GAGARIN_SLIDE_INDEX){
+    gagarinStep = 0;
+    playGagarinStep(0);
+  } else {
+    stopGagarin();
+  }
+  if(current !== 8){
+    const v = document.getElementById('main-video');
+    if(v){ v.pause(); v.currentTime = 0; v.style.display = 'none'; }
+    const ph = document.getElementById('video-placeholder');
+    if(ph) ph.style.display = 'flex';
+  }
+  if(current !== CLOSING_SLIDE_INDEX){
+    hideBloopersInfo();
+    hideBloopersVideo();
+  }
+  notifyManager();
+}
+
+document.addEventListener('click', e => {
+  if(!started) return;
+  if(bloopersInfoShown || bloopersVideoShown) return;
+  const ph = document.getElementById('video-placeholder');
+  if(ph && ph.contains(e.target)){
+    e.stopPropagation();
+    const v = document.getElementById('main-video');
+    if(v){
+      v.style.display = 'block';
+      ph.style.display = 'none';
+      v.play().catch(()=>{
+        v.style.display = 'none';
+        ph.style.display = 'flex';
+        showVideoError(ph, 'video/lunik3_campo.mp4');
+      });
+    }
+    return;
+  }
+  const activeFsVideo = document.querySelector('.slide-bg.active video.fs-video');
+  if(activeFsVideo && activeFsVideo.paused && activeFsVideo.currentTime === 0){
+    e.stopPropagation();
+    activeFsVideo.play().catch(()=>{});
+    return;
+  }
+  if(handleGagarinAdvance()) return;
+  goTo(current + 1);
+});
+
+function showVideoError(placeholderEl, path){
+  const label = placeholderEl.querySelector('.video-label');
+  const fname = placeholderEl.querySelector('.video-filename');
+  if(label) label.textContent = 'No se pudo cargar el video';
+  if(fname) fname.textContent = 'Verificá que exista el archivo "' + path + '" junto al HTML';
+}
+
+(function(){
+  const v = document.getElementById('main-video');
+  const ph = document.getElementById('video-placeholder');
+  if(v && ph){
+    v.addEventListener('error', () => {
+      v.style.display = 'none';
+      ph.style.display = 'flex';
+      showVideoError(ph, 'video/lunik3_campo.mp4');
+    });
+  }
+})();
+
+function startPresentation(){
+  if(started) return;
+  started = true;
+  const intro = document.getElementById('intro');
+  const presenter = document.getElementById('presenter');
+  intro.classList.add('hide');
+  presenter.classList.add('show');
+  setTimeout(() => { intro.style.display = 'none'; }, 700);
+  buildDots();
+  renderSlide();
+}
+
+document.getElementById('start-btn').addEventListener('click', function(e){
+  e.stopPropagation();
+  startPresentation();
+});
+
+let managerWin = null;
+
+// Inicializar cámara ahora que managerWin está definido
+initCamera();
+
+function openManager() {
+  if (managerWin && !managerWin.closed) { managerWin.focus(); return; }
+
+  const MANAGER_HTML = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Manager · Código Kremlin</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#0a0a0a;color:#fff;font-family:'Oswald',sans-serif;overflow:hidden}
+#mgr-layout { display: flex; flex-direction: row; height: 100vh; overflow: hidden; }
+#mgr-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+#mgr-side { width: 340px; background: #050505; border-left: 4px solid #FFD700; display: flex; flex-direction: column; padding: 16px; gap: 16px; flex-shrink: 0; }
+#mgr-header{
+  background:#FF0000;
+  padding:10px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:4px solid #FFD700;
+  flex-shrink:0;
+}
+#mgr-header h1{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:4px;text-transform:uppercase}
+#mgr-counter{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:3px;background:#000;padding:4px 14px;border:2px solid #FFD700}
+#mgr-slides{display:flex;gap:16px;padding:16px;flex-shrink:0;background:#111;border-bottom:3px solid #222}
+.mgr-card{flex:1;border:3px solid #333;background:#0d0d0d;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.mgr-card.current{border-color:#FF0000;box-shadow:0 0 18px rgba(255,0,0,0.4)}
+.mgr-card.next{border-color:#FFD700;box-shadow:0 0 10px rgba(255,215,0,0.2);opacity:0.85}
+.mgr-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:4px;text-transform:uppercase;padding:3px 8px;display:inline-block;margin-bottom:4px}
+.mgr-label.lbl-current{background:#FF0000;color:#fff}
+.mgr-label.lbl-next{background:#FFD700;color:#000}
+.mgr-cat{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:#FF0000}
+.mgr-headline{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:1px;text-transform:uppercase;line-height:1.2;color:#fff;margin-top:4px}
+.mgr-esp{font-size:12px;color:#FFD700;letter-spacing:2px;margin-top:4px;font-family:'Barlow Condensed',sans-serif;font-weight:700}
+#mgr-script-area{flex:1;overflow-y:auto;padding:16px;background:#0d0d0d;display:flex;flex-direction:column;gap:10px;min-height:0}
+#mgr-script-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:#555;padding-bottom:8px;border-bottom:2px solid #222;flex-shrink:0}
+#mgr-script-text{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;line-height:1.7;color:#ddd;white-space:pre-wrap;flex:1}
+#mgr-footer{flex-shrink:0;padding:14px 16px;background:#111;border-top:3px solid #222;display:flex;align-items:center;gap:12px}
+#mgr-btn-prev{
+  background:#222;border:3px solid #555;color:#aaa;
+  font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;
+  letter-spacing:3px;text-transform:uppercase;padding:14px 24px;cursor:pointer;
+  transition:all 0.15s;flex-shrink:0;
+}
+#mgr-btn-prev:hover{border-color:#aaa;color:#fff}
+#mgr-btn-next{
+  flex:1;
+  background:#FF0000;border:4px solid #FFD700;color:#fff;
+  font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;
+  letter-spacing:4px;text-transform:uppercase;padding:18px 40px;cursor:pointer;
+  box-shadow:0 0 20px rgba(255,0,0,0.7);transition:all 0.15s;
+}
+#mgr-btn-next:hover{background:#FF2222;transform:scale(1.02)}
+#mgr-btn-next:active{transform:scale(0.98)}
+#mgr-btn-bloopers{
+  background:#1a1a1a;border:3px solid #FFD700;color:#FFD700;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;padding:14px 18px;cursor:pointer;
+  transition:all 0.15s;flex-shrink:0;
+}
+#mgr-btn-bloopers:hover{background:#FFD700;color:#000}
+#mgr-status{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:3px;color:#444;text-align:center;margin-top:4px;flex-shrink:0}
+.side-title { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: #FF0000; border-bottom: 2px solid #333; padding-bottom: 8px; }
+#live-monitor { width: 100%; aspect-ratio: 16/9; background: #0a0a0a; border: 4px solid #FF0000; position: relative; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; box-shadow: 0 0 20px rgba(255,0,0,0.3); }
+#mon-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 40px; opacity: 0.2; }
+#mon-bars { position: relative; z-index: 10; display: flex; flex-direction: column; background: #FF0000; border-top: 3px solid #FFD700; }
+#mon-thin { background: #D60000; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 900; padding: 2px 6px; letter-spacing: 1px; color:#FFD700; }
+#mon-thick { background: #000; font-family: 'Barlow Condensed', sans-serif; color: #fff; font-size: 14px; font-weight: 900; padding: 4px 6px; border: 2px solid #FFD700; margin: 0 4px 4px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 1px; }
+#mon-badge { position: absolute; bottom: 50px; left: 0; background: #000; color: #FFD700; border: 2px solid #FF0000; border-left: none; padding: 4px 8px; font-size: 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; display: none; }
+#mon-uh { position: absolute; top: 0; left: 0; right: 0; background: #FF0000; color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 900; padding: 4px; text-align: center; display: none; border-bottom: 2px solid #FFD700; letter-spacing: 2px; }
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#111}
+::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="mgr-layout">
+  <div id="mgr-main">
+    <div id="mgr-header">
+      <h1>📋 Manager · Código Kremlin</h1>
+      <div id="mgr-counter">— / —</div>
+    </div>
+    <div id="mgr-slides">
+      <div class="mgr-card current" id="mgr-cur">
+        <span class="mgr-label lbl-current">▶ ACTUAL</span>
+        <div class="mgr-cat" id="cur-cat">—</div>
+        <div class="mgr-headline" id="cur-headline">—</div>
+        <div class="mgr-esp" id="cur-esp"></div>
+      </div>
+      <div class="mgr-card next" id="mgr-nxt">
+        <span class="mgr-label lbl-next">→ SIGUIENTE</span>
+        <div class="mgr-cat" id="nxt-cat">—</div>
+        <div class="mgr-headline" id="nxt-headline">—</div>
+        <div class="mgr-esp" id="nxt-esp"></div>
+      </div>
+    </div>
+    <div id="mgr-script-area">
+      <div id="mgr-script-title">📄 Guión del segmento actual</div>
+      <div id="mgr-script-text">—</div>
+    </div>
+    <div id="mgr-footer">
+      <button id="mgr-btn-prev">◀ ANT</button>
+      <button id="mgr-btn-next">▶ PRÓXIMA DIAPOSITIVA</button>
+      <button id="mgr-btn-bloopers" title="Reproducir el video de bloopers en la ventana principal">🎬 Mostrar Bloopers</button>
+    </div>
+    <div id="mgr-status">Manager sincronizado · Use los botones o la presentación principal</div>
+  </div>
+  <div id="mgr-side">
+    <div class="side-title">📺 VISTA EN VIVO</div>
+    <div id="live-monitor">
+      <video id="mgr-cam-preview" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity 0.5s;transform:scaleX(-1);"></video>
+      <div id="mon-bg">📷</div>
+      <div id="mon-uh">🔴 ÚLTIMA HORA</div>
+      <div id="mon-badge"></div>
+      <div id="mon-bars">
+        <div id="mon-thin">CÓDIGO KREMLIN</div>
+        <div id="mon-thick" id="mon-headline-text"></div>
+      </div>
+    </div>
+    <div style="flex:1; background:#0d0d0d; border:2px solid #222; padding:12px; font-family:'Barlow Condensed', sans-serif; font-size:14px; color:#888; letter-spacing: 1px; display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:11px;font-weight:900;letter-spacing:4px;color:#FF0000;border-bottom:2px solid #222;padding-bottom:8px;text-transform:uppercase;">📡 Estado de Transmisión</div>
+      <div>SEÑAL VIDEO: <span id="mgr-cam-status" style="color:#0f0; font-weight:900;">VERIFICANDO…</span></div>
+      <div>LATENCIA: <span id="mgr-latency" style="color:#fff; font-weight:900;">12ms</span></div>
+      <div>CÁMARAS EN ESTUDIO: <span style="color:#fff; font-weight:900;">2 ACTIVAS</span></div>
+      <div style="margin-top:4px;border-top:2px solid #222;padding-top:10px;">
+        <div style="font-size:11px;font-weight:900;letter-spacing:4px;color:#FFD700;margin-bottom:8px;text-transform:uppercase;">⏱ Tiempo en Aire</div>
+        <div id="mgr-timer" style="font-size:28px;font-weight:900;color:#fff;letter-spacing:3px;font-family:'Barlow Condensed',sans-serif;">00:00:00</div>
+      </div>
+      <div style="margin-top:4px;border-top:2px solid #222;padding-top:10px;">
+        <div style="font-size:11px;font-weight:900;letter-spacing:4px;color:#FFD700;margin-bottom:8px;text-transform:uppercase;">📊 Progreso del Programa</div>
+        <div id="mgr-progress-bar" style="height:12px;background:#1a1a1a;border:2px solid #333;border-radius:2px;overflow:hidden;">
+          <div id="mgr-progress-fill" style="height:100%;background:linear-gradient(90deg,#FF0000,#FFD700);width:0%;transition:width 0.4s ease;"></div>
+        </div>
+        <div id="mgr-progress-label" style="font-size:12px;color:#555;margin-top:4px;letter-spacing:2px;">0 / 0 segmentos</div>
+      </div>
+      <div style="margin-top:4px;border-top:2px solid #222;padding-top:10px;">
+        <div style="font-size:11px;font-weight:900;letter-spacing:4px;color:#FFD700;margin-bottom:8px;text-transform:uppercase;">🕐 Reloj de Estudio</div>
+        <div id="mgr-clock" style="font-size:22px;font-weight:900;color:#fff;letter-spacing:2px;font-family:'Barlow Condensed',sans-serif;">--:--:--</div>
+      </div>
+    </div>
+  </div>
+<script>
+  let slides = [];
+  let current = 0;
+  let airStart = null;
+  let timerInterval = null;
+
+  // Timer en aire
+  function startTimer(){
+    if(timerInterval) return;
+    airStart = Date.now();
+    timerInterval = setInterval(function(){
+      const elapsed = Math.floor((Date.now() - airStart) / 1000);
+      const h = String(Math.floor(elapsed/3600)).padStart(2,'0');
+      const m = String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
+      const s = String(elapsed%60).padStart(2,'0');
+      const el = document.getElementById('mgr-timer');
+      if(el) el.textContent = h + ':' + m + ':' + s;
+    }, 1000);
+  }
+
+  // Reloj de estudio
+  setInterval(function(){
+    const n = new Date();
+    const el = document.getElementById('mgr-clock');
+    if(el) el.textContent =
+      String(n.getHours()).padStart(2,'0') + ':' +
+      String(n.getMinutes()).padStart(2,'0') + ':' +
+      String(n.getSeconds()).padStart(2,'0');
+    // Latencia simulada realista
+    const lat = document.getElementById('mgr-latency');
+    if(lat) lat.textContent = (10 + Math.floor(Math.random()*8)) + 'ms';
+  }, 1000);
+
+  // Actualizar barra de progreso
+  function updateProgress(){
+    const total = slides.length;
+    if(!total) return;
+    const pct = Math.round(((current + 1) / total) * 100);
+    const fill = document.getElementById('mgr-progress-fill');
+    const label = document.getElementById('mgr-progress-label');
+    if(fill) fill.style.width = pct + '%';
+    if(label) label.textContent = (current + 1) + ' / ' + total + ' segmentos (' + pct + '%)';
+  }
+
+  function render() {
+    const total = slides.length;
+    if (!total) return;
+    const s = slides[current];
+    const nxt = slides[(current + 1) % total];
+
+    document.getElementById('mgr-counter').textContent = (current + 1) + ' / ' + total;
+
+    document.getElementById('cur-cat').textContent = s.cat || '';
+    document.getElementById('cur-headline').textContent = s.headline || '';
+    const espEl = document.getElementById('cur-esp');
+    espEl.textContent = s.esp ? '👤 ' + s.esp.name + ' · ' + s.esp.role : (s.badge ? '🎙 ' + s.badge.name : '');
+
+    document.getElementById('nxt-cat').textContent = nxt.cat || '';
+    document.getElementById('nxt-headline').textContent = nxt.headline || '';
+    const nxtEspEl = document.getElementById('nxt-esp');
+    nxtEspEl.textContent = nxt.esp ? '👤 ' + nxt.esp.name + ' · ' + nxt.esp.role : (nxt.badge ? '🎙 ' + nxt.badge.name : '');
+
+    document.getElementById('mgr-script-text').textContent = s.script || '(Sin guión para este segmento)';
+
+    document.getElementById('mon-thin').textContent = s.cat || '';
+    document.getElementById('mon-thick').textContent = s.headline || '';
+
+    const mBadge = document.getElementById('mon-badge');
+    if (s.esp || s.badge) {
+      mBadge.style.display = 'block';
+      mBadge.textContent = s.esp ? s.esp.name : s.badge.name;
+    } else {
+      mBadge.style.display = 'none';
+    }
+
+    const mUh = document.getElementById('mon-uh');
+    mUh.style.display = s.ultimaHora ? 'block' : 'none';
+
+    updateProgress();
+  }
+
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'KREMLIN_INIT') {
+      slides = e.data.slides;
+      current = e.data.current;
+      startTimer();
+      render();
+    }
+    if (e.data && e.data.type === 'KREMLIN_UPDATE') {
+      current = e.data.current;
+      render();
+    }
+    if (e.data && e.data.type === 'KREMLIN_CAM_OK') {
+      const el = document.getElementById('mgr-cam-status');
+      if(el){ el.textContent = 'OK ✓'; el.style.color = '#0f0'; }
+    }
+    if (e.data && e.data.type === 'KREMLIN_CAM_ERR') {
+      const el = document.getElementById('mgr-cam-status');
+      if(el){ el.textContent = 'FALLO ✗'; el.style.color = '#FF0000'; }
+    }
+  });
+
+  // Comprobar estado de cámara con la ventana principal periódicamente
+  setTimeout(function(){
+    const el = document.getElementById('mgr-cam-status');
+    if(el && el.textContent === 'VERIFICANDO…'){ el.textContent = 'ESPERANDO…'; el.style.color = '#FFD700'; }
+  }, 5000);
+
+  window.opener && window.opener.postMessage({ type: 'KREMLIN_READY' }, '*');
+
+  // Iniciar preview de cámara en el manager
+  (function startCamPreview(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ideal:640}, height:{ideal:360} }, audio:false })
+      .then(stream => {
+        const v = document.getElementById('mgr-cam-preview');
+        if(v){ v.srcObject = stream; v.play().catch(()=>{}); v.style.opacity = '1'; }
+        const el = document.getElementById('mgr-cam-status');
+        if(el){ el.textContent = 'OK ✓'; el.style.color = '#0f0'; }
+        const bg = document.getElementById('mon-bg');
+        if(bg) bg.style.display = 'none';
+      })
+      .catch(() => {
+        const el = document.getElementById('mgr-cam-status');
+        if(el){ el.textContent = 'FALLO ✗'; el.style.color = '#FF0000'; }
+      });
+  })();
+
+  document.getElementById('mgr-btn-next').addEventListener('click', function() {
+    window.opener && window.opener.postMessage({ type: 'KREMLIN_NEXT' }, '*');
+  });
+  document.getElementById('mgr-btn-prev').addEventListener('click', function() {
+    window.opener && window.opener.postMessage({ type: 'KREMLIN_PREV' }, '*');
+  });
+  document.getElementById('mgr-btn-bloopers').addEventListener('click', function() {
+    window.opener && window.opener.postMessage({ type: 'KREMLIN_SHOW_BLOOPERS' }, '*');
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.code === 'Space' || e.code === 'ArrowRight') { e.preventDefault(); window.opener && window.opener.postMessage({ type: 'KREMLIN_NEXT' }, '*'); }
+    if (e.code === 'ArrowLeft') { e.preventDefault(); window.opener && window.opener.postMessage({ type: 'KREMLIN_PREV' }, '*'); }
+  });
+<\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([MANAGER_HTML], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
+  managerWin = window.open(url, 'kremlin_manager', 'width=1100,height=680,resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no');
+
+  if (!managerWin) {
+    alert('El navegador bloqueó la ventana emergente. Por favor permitila para este sitio.');
+  }
+}
+
+function notifyManager() {
+  if (managerWin && !managerWin.closed) {
+    managerWin.postMessage({ type: 'KREMLIN_UPDATE', current: current }, '*');
+  }
+}
+
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'KREMLIN_READY') {
+    if (managerWin && !managerWin.closed) {
+      managerWin.postMessage({ type: 'KREMLIN_INIT', slides: slides, current: current }, '*');
+    }
+  }
+  if (!started) return;
+  if (e.data && e.data.type === 'KREMLIN_NEXT'){ if(!handleGagarinAdvance()) goTo(current + 1); }
+  if (e.data && e.data.type === 'KREMLIN_PREV') goTo(current - 1);
+  if (e.data && e.data.type === 'KREMLIN_SHOW_BLOOPERS') showBloopersVideo();
+});
+
+document.getElementById('manager-btn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  openManager();
+});
+
+document.addEventListener('keydown', e => {
+  if(!started){
+    if(e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); startPresentation(); }
+    return;
+  }
+
+  if(e.code === 'Escape' && bloopersVideoShown){ e.preventDefault(); hideBloopersVideo(); return; }
+
+  if(e.code === 'KeyB' && current === CLOSING_SLIDE_INDEX && !bloopersInfoShown && !bloopersVideoShown){
+    e.preventDefault();
+    showBloopersInfo();
+    return;
+  }
+
+  if(bloopersInfoShown){
+    if(e.code === 'Space'){ e.preventDefault(); showBloopersVideo(); }
+    return;
+  }
+
+  if(bloopersVideoShown) return;
+
+  if(e.code === 'Space' || e.code === 'ArrowRight'){
+    e.preventDefault();
+    if(handleGagarinAdvance()) return;
+    goTo(current + 1);
+  }
+  if(e.code === 'ArrowLeft'){ e.preventDefault(); goTo(current - 1); }
+  if(e.code === 'Digit1' || e.code === 'Numpad1'){ goTo(0); }
+});
+</script>
+</body>
+</html>
